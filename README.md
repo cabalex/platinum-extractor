@@ -9,7 +9,7 @@ A spiritual successor to [Astral Extractor](https://cabalex.github.io/astral-ext
 If you find any major bugs or features you would like to see, don't hesitate to open an issue on GitHub. Please note I may not be able to get around to everything, nor do I own every game or can make every file extractable/moddable, so be patient! If you know how to implement something, you can maybe even open a pull request.
 
 ## Development
-This project is split into two parts-- the [JavaScript library platinum-extract](https://cabalex.github.io/platinum-extract) and the [front end platinum-extractor](https://cabalex.github.io/platinum-extractor), written in Svelte. They are designed to work in tandem, though the JavaScript library is there in case anyone wants to write scripts that use it. All file extraction and modding is done through the JavaScript library, so [visit that repository for any pull requests you make regarding file extraction](https://cabalex.github.io/platinum-extract).
+This project is split into two parts-- the [JavaScript library platinum-extract](https://github.com/cabalex/platinum-extract) and the [front end platinum-extractor](https://github.com/cabalex/platinum-extractor), written in Svelte. They are designed to work in tandem, though the JavaScript library is there in case anyone wants to write scripts that use it. All file extraction and modding is done through the JavaScript library, so [visit that repository for any pull requests you make regarding file extraction](https://github.com/cabalex/platinum-extract).
 
 How to get started:
 1. Clone both repositories into **separate directories**.
