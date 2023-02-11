@@ -1,0 +1,38 @@
+{
+  "name": "app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "dependencies": {
+    "@cabalex/platinum-extract": "file:./dist",
+    "jszip": "^3.10.1",
+    "svelte-ace": "^1.0.21",
+    "svelte-material-icons": "^2.0.4"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@sveltejs/vite-plugin-svelte": "^1.1.0",
+    "@tsconfig/svelte": "^3.0.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "svelte": "^3.52.0",
+    "svelte-check": "^2.9.2",
+    "svelte-preprocess": "^4.10.7",
+    "tslib": "^2.4.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.2.2",
+    "vite-plugin-top-level-await": "^1.2.1",
+    "vite-plugin-wasm": "^3.1.0",
+    "vite-plugin-wasm-pack": "^0.1.12"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  }
+}
