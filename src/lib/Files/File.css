@@ -1,0 +1,46 @@
+/*
+A separate CSS file is used here since file styles are used in multiple places
+(search bar and individual files).
+*/
+
+.file {
+    width: 100%;
+}
+.filename:before {
+    content: url('https://img.icons8.com/color/20/000000/file.png');
+    display: inline-block;
+    vertical-align: middle;
+}
+/* file types */
+.text > .filename:before {
+    content: url('https://img.icons8.com/color/20/000000/document.png');
+}
+.modified > .filename:before {
+    content: url('https://img.icons8.com/color/20/000000/new-file.png');
+}
+.folder > .filename:before {
+    content: url('https://img.icons8.com/color/20/000000/folder-invoices--v1.png');
+}
+.folder.open > .filename:before {
+    content: url('https://img.icons8.com/color/20/000000/opened-folder.png');
+}
+.folder > .filename {
+    position: sticky !important;
+    background-color: var(--sidebar-dark) !important;
+    z-index: 1;
+    top: 0;
+}
+.file .filename {
+    width: 100%;
+    user-select: none;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.file .contents {
+    margin-left: 20px;
+}
+.file.active .filename {
+    background: linear-gradient(to right, var(--sidebar-dark), #555) !important;
+}

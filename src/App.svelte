@@ -19,6 +19,6 @@
 <div>
   <Files fileHandler={fileHandler} />
 </div>
-<Main />
+<Main fileHandler={fileHandler} />
 
 <Toasts />

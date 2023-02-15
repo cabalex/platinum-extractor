@@ -1,16 +1,27 @@
 <script lang="ts">
-    import { readableBytes } from "../../FileHandler";
+    import { afterUpdate } from 'svelte';
     import { slide } from "svelte/transition";
-    import { loadedFile, settings } from "../Main/MainStore";
+    import './File.css';
+    import { readableBytes } from "../../FileHandler";
+    import { loadedFile, searchedFile, settings } from "../Main/MainStore";
     import { addToast } from "../Toasts/ToastStore";
     import FileQuickActions from "./FileQuickActions.svelte";
     import { defineFile } from "@cabalex/platinum-extract";
 
     export let file;
     export let fileHandler;
+    let elem = null;
+    
     let active = false;
     let { files } = file;
-    let showContents = (files && $files.length < 100);
+    let showContents = files && $files.length < 100;
+    $: {
+        // only show contents if the file is the searched file
+        // do not toggle showContents off when the searched file is changed
+        if (!showContents && files && $searchedFile && file.includes($searchedFile)) {
+            showContents = true;
+        }
+    }
 
     if (files && $files.length >= 100 && !$settings.seenLargeFilesWarning) {
         addToast({
@@ -22,7 +33,17 @@
         $settings.seenLargeFilesWarning = true;
     }
 
+    afterUpdate(() => {
+        if ($searchedFile === file) {
+            console.log("scrolling into view")
+            elem.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+        }
+    })
+
     async function open() {
+        // reset searched file
+        searchedFile.set(null);
+
         if ($files && typeof $files.length === "number") {
             // If folder
             showContents = !showContents;
@@ -85,9 +106,10 @@
 <div
     class={"file " + defineFile(file.name).replace("/", " ")}
     title={file.name}
+    bind:this={elem}
     class:modified={file.modified}
     class:open={files && $files.length && showContents}
-    class:active={$loadedFile == file || active}
+    class:active={$loadedFile == file || active || $searchedFile == file}
     class:folder={$files && typeof $files.length === "number"}
 >
     <div
@@ -110,47 +132,3 @@
     </div>
     {/if}
 </div>
-
-<style>
-    .file {
-        width: 100%;
-    }
-    .filename:before {
-        content: url('https://img.icons8.com/color/20/000000/file.png');
-        display: inline-block;
-        vertical-align: middle;
-    }
-    /* file types */
-    .text > .filename:before {
-        content: url('https://img.icons8.com/color/20/000000/document.png');
-    }
-    .modified > .filename:before {
-        content: url('https://img.icons8.com/color/20/000000/new-file.png');
-    }
-    .folder > .filename:before {
-        content: url('https://img.icons8.com/color/20/000000/folder-invoices--v1.png');
-    }
-    .folder.open > .filename:before {
-        content: url('https://img.icons8.com/color/20/000000/opened-folder.png');
-    }
-    .folder > .filename {
-        position: sticky !important;
-        background-color: var(--sidebar-dark) !important;
-        z-index: 1;
-        top: 0;
-    }
-    .file .filename {
-        width: 100%;
-        user-select: none;
-        cursor: pointer;
-        position: relative;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-    .file .contents {
-        margin-left: 20px;
-    }
-    .file.active .filename {
-        background: linear-gradient(to right, var(--sidebar-dark), #555) !important;
-    }
-</style>

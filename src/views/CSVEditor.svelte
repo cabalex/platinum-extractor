@@ -3,8 +3,9 @@
     import Pencil from "svelte-material-icons/Pencil.svelte";
     import DatabaseEye from "svelte-material-icons/DatabaseEye.svelte";
     import Beta from "../assets/Beta.svelte";
-  import TextEditor from "./TextEditor.svelte";
+    import TextEditor from "./TextEditor.svelte";
     
+    // svelte-ignore unused-export-let
     export let data;
     export let ext;
 

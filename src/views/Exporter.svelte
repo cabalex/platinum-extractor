@@ -7,11 +7,12 @@
     import { asyncForEach, downloadArrayBuffer } from "../FileHandler";
 
     export let ext;
+    // svelte-ignore unused-export-let
     export let data;
 
     $: files = $loadedFile.files;
 
-    let select = {value: 'astral-chain'};
+    let game = localStorage.getItem('pe-game') || 'astral-chain';
 
     function errorExporting(e) {
         addToast({
@@ -23,6 +24,18 @@
     }
 
     async function exportDAT(isDAT = true) {
+        for (let i = 0; i < $files.length; i++) {
+            if ($files[i].files) {
+                return addToast({
+                    title: "Can't export DAT",
+                    message: `This folder contains a subfolder (${$files[i].name}) that hasn't been repacked. Please repack it, reupload it to this folder, and delete the old file.\n(This limitation will be fixed in the future)`,
+                    type: "danger",
+                    timeout: 10000
+                })
+            }
+        }
+
+
         let toastId = addToast({
             title: "Exporting DAT...",
             message: `Packing ${$files.length} files...`,
@@ -45,7 +58,7 @@
             title: "Exporting DAT...",
             message: `Packing DAT contents...`
         })
-        let arrayBuffer = await DAT.repack(packedFiles, isDAT ? "DAT" : "DTT", select.value).catch(errorExporting);
+        let arrayBuffer = await DAT.repack(packedFiles, isDAT ? "DAT" : "DTT", game).catch(errorExporting);
 
         if (!arrayBuffer) {
             dismissToast(toastId);
@@ -77,17 +90,17 @@
 
 <div class="exporter">
     <h2>Export folder {$loadedFile.name} to
-        <select bind:this={select}>
-            <option value="" disabled>(not soon) Anarchy Reigns</option>
+        <select bind:value={game} on:change={(e) => localStorage.setItem('pe-game', e.target.value)}>
+            <option value="anarchy-reigns" disabled>(not soon) Anarchy Reigns</option>
             <option value="astral-chain">Astral Chain</option>
             <option value="bayo-1-be" disabled>(soon) Bayonetta 1 (PC / Wii U)</option>
             <option value="bayo-2-be" disabled>(soon) Bayonetta 2 (Wii U)</option>
             <option value="bayo-2-le" disabled>(soon) Bayonetta 2 (Switch)</option>
             <option value="bayo-3" disabled>(soon) Bayonetta 3</option>
             <option value="nier-replicant" disabled>(soon) NieR: Replicant</option>
-            <option value="nier-automata" disabled>(soon) NieR: Automata</option>
+            <option value="nier-automata">NieR: Automata</option>
             <option value="nier-automata-switch" disabled>(soon) NieR: Automata (Switch)</option>
-            <option value="mgr" disabled>(soon) Metal Gear Rising: Revengence</option>
+            <option value="mgr">Metal Gear Rising: Revengence</option>
             <option value="star-fox-zero" disabled>(not soon) Star Fox Zero</option>
             <option value="star-fox-guard" disabled>(not soon) Star Fox Guard</option>
             <option value="transformers" disabled>(not soon) Transformers: Devastation</option>
@@ -105,12 +118,33 @@
         </div>
         {/if}
         <h3>Export options</h3>
-        {#if select.value == "astral-chain"}
-            <ExportType fileExt={ext.toLowerCase() === 'dtt' ? '' : ext} ext="DAT" download={exportDAT.bind(null, true)} description={"Platinum Games' signature folder format, used in most games. Uncompressed."} />
-            <ExportType fileExt={ext.toLowerCase() === 'dtt' ? 'DTT' : ''} ext="DTT" download={exportDAT.bind(null, false)} description={"(COMING SOON) DAT File format, but optimized for large data segments (models, texture data, etc). DTT files are always paired with DAT files."} />
-            <ExportType fileExt={ext} ext="PKZ" download={() => {}} description={"(COMING SOON) Astral Chain's compressed file format, compressed with ZStandard."} />
-        {:else}
-            <p>Coming soon!</p>
+        <ExportType
+            fileExt={ext.toLowerCase() === 'dtt' ? '' : ext}
+            ext="DAT"
+            download={exportDAT.bind(null, true)}
+            description={"Platinum Games' signature folder format, used in most games. Uncompressed."}
+        />
+        <p><b>Deep waters ahead!</b> Though similar, formats beyond DAT can vary between games (and many cases haven't been tested). Export at your own risk!</p>
+        {#if game == "astral-chain"}
+            <ExportType
+                fileExt={ext.toLowerCase() === 'dtt' ? 'DTT' : ''}
+                ext="DTT"
+                download={exportDAT.bind(null, false)}
+                description={"(COMING SOON) DAT File format, but optimized for large data segments (models, texture data, etc). DTT files are always paired with DAT files."}
+            />
+            <ExportType
+                fileExt={ext}
+                ext="PKZ"
+                download={() => {}}
+                description={"(COMING SOON) Astral Chain's compressed file format, compressed with ZStandard."}
+            />
+        {:else if game == "nier-automata" || game == "mgr"}
+            <ExportType
+                fileExt={ext}
+                ext="CPK"
+                link={{href: "https://github.com/esperknight/CriPakTools", text: "Download CriPakTools"}}
+                description={"Repacking CPKs isn't necessary for most games, and is sort of a pain, but if you must, you'll have to use a different tool such as CriPakTools."}
+            />
         {/if}
     </main>
 </div>

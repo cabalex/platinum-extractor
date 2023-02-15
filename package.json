@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@cabalex/platinum-extract": "file:./dist",
+    "@sveltejs/svelte-virtual-list": "^3.0.1",
     "jszip": "^3.10.1",
     "svelte-ace": "^1.0.21",
     "svelte-material-icons": "^2.0.4"

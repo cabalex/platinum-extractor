@@ -85,11 +85,14 @@ button {
 button svg {
   transform: scale(1.5);
 }
-button:hover {
+button:disabled {
+  cursor: not-allowed;
+}
+button:not(button:disabled):hover {
   border-color: #646cff;
 }
-button:focus,
-button:focus-visible {
+button:not(button:disabled):focus,
+button:not(button:disabled):focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 

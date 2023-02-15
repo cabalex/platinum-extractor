@@ -7,11 +7,13 @@
 
     let toastDiv;
     let autoscroll;
+    let scrollable = false;
     beforeUpdate(() => {
         autoscroll = toastDiv && (toastDiv.offsetHeight + toastDiv.scrollTop) > (toastDiv.scrollHeight - 20);
     });
 
     afterUpdate(() => {
+        scrollable = toastDiv && toastDiv.scrollHeight > window.innerHeight;
         if (autoscroll) {
             let scrollAnimStart = Date.now();
             const scroll = () => {
@@ -19,6 +21,7 @@
                 if (Date.now() - scrollAnimStart < 300) {
                     requestAnimationFrame(scroll);
                 }
+                scrollable = toastDiv && toastDiv.scrollHeight > window.innerHeight;
             };
 
             requestAnimationFrame(scroll);
@@ -28,7 +31,7 @@
 </script>
 
 {#if $toasts}
-    <div class="toasts" bind:this={toastDiv} style={$toasts.length > 3 ? "pointer-events: all" : ""}>
+    <div class="toasts" bind:this={toastDiv} style={scrollable ? "pointer-events: all" : ""}>
         <div class="toastsScrollable">
             {#each $toasts as toast (toast.id)}
                 <div

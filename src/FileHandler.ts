@@ -1,4 +1,4 @@
-import { DAT, PKZ, CPK, CSV, BXM, defineFile } from "@cabalex/platinum-extract";
+import { DAT, PKZ, CPK, defineFile, resolveFile } from "@cabalex/platinum-extract";
 import { writable, get } from 'svelte/store';
 import { addToast } from "./lib/Toasts/ToastStore";
 
@@ -87,6 +87,29 @@ export class Folder {
         this.addFiles(folder);
         return folder;
     }
+
+    /**
+     * Searches in a folder for a filename.
+     * @param query Search query.
+     * @param recursive Whether to check subfolders or not.
+     * @returns 
+     */
+    search(query: string, recursive: boolean = true) {
+        let ctx = this;
+        let results = [];
+        let files = get(ctx.files);
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            if (file.name.toLowerCase().includes(query.toLowerCase())) {
+                results.push(file);
+            }
+            if (file instanceof Folder && recursive) {
+                results.push(...file.search(query));
+            }
+        }
+        return results;
+    }
+
     /**
      * Checks recursively if a file is in the folder or any of its subfolders.
      */
@@ -263,46 +286,34 @@ export default class FileHandler extends Folder {
                         })
                     }
                     break;
-                case "text/xml":
-                    extracted = await BXM.extract(file.file, file.name);
-                    if (print) addToast({
-                        title: "Extracted BXM",
-                        message: `Extracted ${file.name}.`,
-                        type: "success",
-                        timeout: 10000
-                    });
-                    if (returnInstance) return extracted;
-
-                    if (replace) {
-                        this.replaceFile(replace, extracted);
-                    } else {
-                        this.set([...get(this.files), extracted]);
-                    }
-                    break;
-                case "text/csv":
-                    extracted = await CSV.extract(file.file, file.name);
-                    if (print) addToast({
-                        title: "Extracted CSV",
-                        message: `Extracted ${file.name}.`,
-                        type: "success",
-                        timeout: 10000
-                    });
-                    if (returnInstance) return extracted;
-
-                    if (replace) {
-                        this.replaceFile(replace, extracted);
-                    } else {
-                        this.set([...get(this.files), extracted]);
-                    }
-                    break;
                 default:
-                    if (print) addToast({
-                        title: `Extraction error`,
-                        message: `I don't support this file type (${file.name}) right now. Try again later or open an issue to request support.`,
-                        type: "danger",
-                        timeout: 10000
-                    })
-                    if (returnInstance) return null;
+                    extracted = await resolveFile(file.name).extract(file.file, file.name);
+
+                    if (extracted) {
+                        if (print) addToast({
+                            title: "Extracted file",
+                            message: `Extracted ${file.name}.`,
+                            type: "success",
+                            timeout: 10000
+                        });
+
+                        if (returnInstance) return extracted;
+
+                        if (replace) {
+                            this.replaceFile(replace, extracted);
+                        } else {
+                            this.set([...get(this.files), extracted]);
+                        }
+                    } else if (print) {
+                        addToast({
+                            title: `Extraction error`,
+                            message: `I don't support this file type (${file.name}) right now. Try again later or open an issue to request support.`,
+                            type: "danger",
+                            timeout: 10000
+                        })
+                        
+                        if (returnInstance) return null;
+                    }
             }
         }
 

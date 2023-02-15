@@ -1,13 +1,23 @@
 <script lang="ts">
+    import './File.css';
+    import { slide } from "svelte/transition";
     import type FileHandler from "src/FileHandler";
+    import { get } from "svelte/store";
     import File from "./File.svelte";
     import Delete from "svelte-material-icons/Delete.svelte";
-  import { loadedFile } from "../Main/MainStore";
+    import Magnify from "svelte-material-icons/Magnify.svelte";
+    import { loadedFile, searchedFile } from "../Main/MainStore";
+    import { defineFile } from "@cabalex/platinum-extract";
 
     export let fileHandler: FileHandler;
     let isDragHovering = false;
     let fileInput = null;
     let { files } = fileHandler;
+
+    let searchQuery;
+    $: searchResults = (searchQuery && searchQuery.length >= 3) ?
+        fileHandler.search(searchQuery) :
+        [];
     
     const handleDragDrop = (e) => {
         e.preventDefault();
@@ -32,6 +42,11 @@
             
         }
     }
+
+    const jumpToFile = (file) => {
+        searchQuery = "";
+        searchedFile.set(file);
+    }
 </script>
 
 <aside
@@ -47,6 +62,31 @@
         <a href="https://cabalex.github.io" class="logo">cabalex.github.io</a>
         <h1>Platinum Extractor</h1>
     </header>
+    {#if $files.length > 0}
+    <div class="search" transition:slide|local={{ duration: 200 }}>
+        <input bind:value={searchQuery} type="text" placeholder="Search imported files..." />
+        <Magnify width="1.5em" height="1.5em" />
+        {#if (searchQuery && searchQuery.length >= 3)}
+        <div class="results" transition:slide|local={{ duration: 200 }}>
+            <span>Showing {searchResults.length} results</span>
+            {#each searchResults as result}
+                <div
+                    class={"file " + defineFile(result.name).replace("/", " ")}
+                    title={result.name}
+                    class:modified={result.modified}
+                    class:active={$loadedFile == result}
+                    class:folder={result.files && typeof get(result.files).length === "number"}
+                    tabindex="0"
+                    on:click={() => jumpToFile(result)}
+                    on:keypress={(e) => e.key === "Enter" && jumpToFile(result)}
+                >
+                    <div class="filename">{result.name}</div>
+                </div>
+            {/each}
+        </div>
+        {/if}
+    </div>
+    {/if}
     <div class="rootDir">
         {#each $files as file}
             {#key `${file.name}-${file.isPartial}`}
@@ -79,7 +119,6 @@
         justify-content: flex-start;
         width: 100%;
         height: 50px;
-        margin-bottom: 10px;
         gap: 10px;
         border-bottom: 1px solid #ccc;
     }
@@ -100,6 +139,48 @@
     .files.empty .uploadMore {
         height: 100%;
         font-size: 20px;
+    }
+    .search {
+        width: calc(100% - 20px);
+        padding: 10px;
+        background-color: #444;
+        border-bottom: 1px solid #888;
+        margin-bottom: 10px;
+
+        display: flex;
+        gap: 10px;
+        align-items: center;
+
+        position: relative;
+    }
+    .search input {
+        border: none;
+        outline: none;
+        background-color: transparent;
+        height: 100%;
+        font-size: 1.2em;
+        flex-grow: 1;
+    }
+    .search .results {
+        box-shadow: 5px 10px 20px rgba(0, 0, 0, 0.5);
+        position: absolute;
+        padding: 10px;
+        width: calc(100% - 20px);
+        top: calc(100% + 1px);
+        left: 0;
+        z-index: 60;
+        background-color: #444;
+        max-height: calc(90vh - 100px);
+        overflow-y: auto;
+    }
+    .search .results > span {
+        
+    }
+    .search .results .file:not(:hover):not(.active) {
+        background-color: transparent !important;
+    }
+    .search .results .file:hover {
+        background-color: #333 !important;
     }
     aside.files {
         display: flex;

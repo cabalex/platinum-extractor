@@ -8,6 +8,10 @@
     import CSVEditor from "../../views/CSVEditor.svelte";
     import Exporter from "../../views/Exporter.svelte";
     import Unloaded from "../../views/Unloaded.svelte";
+    import MCDEditor from "../../views/MCDEditor.svelte";
+    import WTAViewer from "../../views/WTAViewer.svelte";
+
+    export let fileHandler;
 
     const unsubscribe = loadedFile.subscribe((value) => {
     })
@@ -31,8 +35,18 @@
                 return TextEditor;
             case 'text/csv':
                 return CSVEditor;
-            case 'folder/dat':
-                return Exporter;
+            case 'localization/mcd':
+                return MCDEditor;
+            case 'texture/wta':
+                return WTAViewer;
+            case 'texture/wtp':
+                addToast({
+                    type: 'danger',
+                    title: `Load the WTA`,
+                    message: `WTP is just texture data- open ${name.replace('.wtp', '.wta')} to read this file's contents.`,
+                    timeout: 10000
+                })
+                return Unloaded;
             default:
                 addToast({
                     type: 'danger',
@@ -48,7 +62,12 @@
     {#if !$loadedFile}
     <Unloaded />
     {:else}
-        <svelte:component this={fetchComponent($loadedFile.name)} ext={$loadedFile.name.split('.')[1] || ""} data={$loadedFile.toString()} />
+        <svelte:component
+            this={fetchComponent($loadedFile.name)}
+            ext={$loadedFile.name.split('.')[1] || ""}
+            data={$loadedFile.toString()}
+            fileHandler={fileHandler}
+        />
     {/if}
 </main>
 

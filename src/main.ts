@@ -22,7 +22,7 @@ window.onunhandledrejection = (ev) => {
       }
   });
 
-  return false;
+  return true;
 }
 
 export default app
