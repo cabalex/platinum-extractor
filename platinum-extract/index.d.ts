@@ -127,27 +127,159 @@ declare module "games/Global/CSV" {
         static extract(fileBuffer: ArrayBuffer | File, name: string): Promise<CSV>;
     }
 }
+declare module "games/Global/MCD" {
+    import PlatinumFile from "games/Global/PlatinumFile";
+    interface Char {
+        char: string;
+        positionOffset: number;
+    }
+    interface Event {
+        header: any;
+        paragraphs: Array<{
+            header: any;
+            strings: Array<{
+                header: any;
+                text: string;
+                terminator: any;
+            }>;
+        }>;
+    }
+    interface CharGraph {
+        textureID: number;
+        u1: number;
+        v1: number;
+        u2: number;
+        v2: number;
+        width: number;
+        height: number;
+        belowSpacing: number;
+        horizontalSpacing: number;
+    }
+    interface SpecialGraph {
+        languageFlag: number;
+        width: number;
+        height: number;
+        belowSpacing: number;
+        horizontalSpacing: number;
+    }
+    interface UsedEvent {
+        hash: number;
+        index: number;
+        event: Event;
+        name: string;
+    }
+    export default class MCD extends PlatinumFile {
+        data: {
+            chars: Char[];
+            events: Event[];
+            charGraphs: CharGraph[];
+            specialGraphs: SpecialGraph[];
+            usedEvents: UsedEvent[];
+        };
+        constructor(name: string, chars: Char[], events: Event[], charGraphs: CharGraph[], specialGraphs: SpecialGraph[], usedEvents: UsedEvent[], size?: number);
+        static extract(fileBuffer: ArrayBuffer | File, name: string): Promise<MCD>;
+        getArrayBuffer(): Promise<ArrayBuffer>;
+        static repack(chars: Char[], events: Event[], charGraphs: CharGraph[], specialGraphs: SpecialGraph[], usedEvents: UsedEvent[]): Promise<ArrayBuffer>;
+    }
+}
+declare module "games/AstralChain/tools/tegrax1swizzle" {
+    export const formatTable: {
+        R8G8B8A8_UNORM: number[];
+        BC1_UNORM: number[];
+        BC2_UNORM: number[];
+        BC3_UNORM: number[];
+        BC4_UNORM: number[];
+        BC1_UNORM_SRGB: number[];
+        BC2_UNORM_SRGB: number[];
+        BC3_UNORM_SRGB: number[];
+        BC4_SNORM: number[];
+        BC6H_UF16: number[];
+        ASTC_4x4_UNORM: number[];
+        ASTC_8x8_UNORM: number[];
+        ASTC_4x4_SRGB: number[];
+        ASTC_8x8_SRGB: number[];
+    };
+    export function getFormatTable(_format: string): any;
+    export function deswizzle(width: number, height: number, depth: number, blkWidth: number, blkHeight: number, blkDepth: number, roundPitch: number, bpp: number, tileMode: number, size_range: number, data: ArrayBuffer): ArrayBufferLike;
+    export function swizzle(width: number, height: number, depth: number, blkWidth: number, blkHeight: number, blkDepth: number, roundPitch: number, bpp: number, tileMode: number, size_range: number, data: ArrayBuffer): ArrayBufferLike;
+    export function getAddrBlockLinear(x: number, y: number, image_width: number, bytes_per_pixel: number, base_address: number, block_height: number): number;
+    export function loadImageData(format: string, width: number, height: number, depth: number, arrayCount: number, mipCount: number, imageData: ArrayBuffer, blockHeightLog2: number, target?: number, linearTileMode?: boolean): false | ArrayBuffer;
+    export function compressImageData(format: string, width: number, height: number, depth: number, arrayCount: number, mipCount: number, imageData: ArrayBuffer, blockHeightLog2: number, target?: number, linearTileMode?: boolean): false | ArrayBuffer;
+}
+declare module "games/AstralChain/tools/DDS" {
+    export function addDDSHeader(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer): ArrayBufferLike;
+    export function loadDDS(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer): HTMLCanvasElement;
+}
 declare module "games/Global/WTA" {
     import PlatinumFile from "games/Global/PlatinumFile";
-    enum TextureData {
+    export class WTATexture {
+        identifier: string;
+        offset: number;
+        size: number;
+        unknownArrayValue: number;
+        magic: number;
+        imageSize: number;
+        headerSize: number;
+        mipCount: number;
+        type: number;
+        format: number;
+        width: number;
+        height: number;
+        depth: number;
+        textureLayout: number;
+        textureLayout2: number;
+        arrayCount: number;
+        constructor(identifier: number, wtpOffset: number, wtpSize: number, unknownArrayValue: number);
+        get _format(): any;
+        get _type(): string;
+        /**
+         * Extracts a texture from a WTA DataView.
+         * @param view  DataView of the file.
+         * @param offset Offset of the texture.
+         * @param wtpOffset Offset of the texture in the WTP.
+         * @param wtpSize Size of the texture in the WTP.
+         * @param identifier Identifier of the texture.
+         * @param unknownArrayValue Unknown value.
+         * @returns [texture, offset]
+         */
+        static extract(view: DataView, offset: number, wtpOffset: number, wtpSize: number, identifier: number, unknownArrayValue: number): [WTATexture, number];
+        load(wtpTexture: ArrayBuffer): HTMLCanvasElement;
+        /**
+         * Returns an ArrayBuffer of the texture as a file.
+         */
+        download(wtpTexture: ArrayBuffer): ArrayBufferLike;
     }
     /**
      * WTA files are the games' main texture formats.
      */
     export default class WTA extends PlatinumFile {
-        textures: TextureData[];
+        textures: WTATexture[];
         name: string;
-        constructor(name: string);
+        constructor(name: string, textures: WTATexture[], arrayBuffer: ArrayBuffer);
         /**
-         * Extracts a DAT file from an ArrayBuffer.
-         * @param arrayBuffer The array buffer of the DAT file.
-         * @returns the DAT object.
+         * Extracts a WTA file from an ArrayBuffer.
+         * @param arrayBuffer The array buffer of the WTA file.
+         * @returns the WTA object.
          */
         static extract(fileBuffer: ArrayBuffer | File, name: string): Promise<WTA>;
         /**
          * Repacks the WTA file.
          */
         repack(): Promise<ArrayBuffer>;
+    }
+}
+declare module "games/Global/WTP" {
+    import PlatinumFile from "games/Global/PlatinumFile";
+    export default class WTP extends PlatinumFile {
+        name: string;
+        arrayBuffer: ArrayBuffer;
+        constructor(name: string, arrayBuffer: ArrayBuffer);
+        /**
+         * Extracts a WTP file from an ArrayBuffer.
+         * @param arrayBuffer The array buffer of the WTP file.
+         * @returns the WTP object.
+         */
+        static extract(fileBuffer: ArrayBuffer | File, name: string): Promise<WTP>;
     }
 }
 declare module "tools/parseUTF" {
@@ -203,19 +335,22 @@ declare module "tools/defineFile" {
      * - animation: animation/mot
      * - unknown: If we don't know what it is.
      */
-    export default function defineFile(filename: string): "text/xml" | "unknown" | "text/csv" | "localization/bin" | "localization/mcd" | "folder/dat" | "folder/pkz" | "folder/cpk" | "texture/wta" | "texture/wtp" | "texture/wtb" | "model/wmb" | "animation/mot" | "audio/wem" | "audio/bnk" | "audio/wwi" | "audio/wai" | "ruby/rbd" | "ui/uid" | "ui/uvd";
+    export default function defineFile(filename: string): "text/xml" | "unknown" | "text/csv" | "localization/bin" | "localization/mcd" | "folder/dat" | "folder/pkz" | "folder/cpk" | "texture/wta" | "texture/wtp" | "texture/wtb" | "model/wmb" | "model/col" | "animation/mot" | "audio/wem" | "audio/bnk" | "audio/wwi" | "audio/wai" | "ruby/rbd" | "ui/uid" | "ui/uvd";
 }
 declare module "tools/resolveFile" {
     import PKZ from "games/AstralChain/PKZ";
     import BXM from "games/Global/BXM";
     import CSV from "games/Global/CSV";
     import DAT from "games/Global/DAT";
+    import MCD from "games/Global/MCD";
+    import WTA from "games/Global/WTA";
+    import WTP from "games/Global/WTP";
     import CPK from "games/NieR/CPK";
     /**
      * Resolves a file to its respective class.
      * @param filename The filename to check.
      */
-    export default function resolveFile(filename: string): typeof PKZ | typeof BXM | typeof CSV | typeof CPK | typeof DAT | {
+    export default function resolveFile(filename: string): typeof PKZ | typeof BXM | typeof CSV | typeof MCD | typeof WTA | typeof WTP | typeof CPK | typeof DAT | {
         extract: () => null;
     };
 }
