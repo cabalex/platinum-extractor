@@ -41,6 +41,10 @@ A separate CSS file is used here since file styles are used in multiple places
 .file .contents {
     margin-left: 20px;
 }
+.file .contents .visualizerBtn {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
 .file.active .filename {
     background: linear-gradient(to right, var(--sidebar-dark), #555) !important;
 }

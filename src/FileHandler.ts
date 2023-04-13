@@ -26,6 +26,22 @@ export async function asyncForEach(array: Array<any>, callback: (item: any, i: n
     })
 }
 
+export function fileEquality(file1: any, file2: any) {
+    if (file1 === file2) return true;
+    return file1.id === file2.id;
+    /*if (file1.name !== file2.name) return false;
+
+    
+    if (file1.arrayBuffer && file2.arrayBuffer) {
+        if (file1.arrayBuffer.byteLength !== file2.arrayBuffer.byteLength) return false;
+    } else if (file1.arrayBuffer || file2.arrayBuffer) {
+        return false;
+    }
+    console.log(file1, file2)
+
+    return true;*/
+}
+
 function getPercentages(array: Array<any>, property: string) {
     let items = {};
     for (let i = 0; i < array.length; i++) {
@@ -44,18 +60,24 @@ function getPercentages(array: Array<any>, property: string) {
     return output.join(', ');
 }
 
+const randomID = () => Date.now().toString(36) + Math.random().toString(36).substring(2);
+
 export class Folder {
+    id = randomID();
     set;
     files = writable([], (set) => {
         this.set = set;
     })
     name: string;
     isPartial = false;
-    root?: PKZ|DAT;
+    root?: any;
 
     constructor(name: string, root?: PKZ|DAT) {
         this.name = name;
         this.root = root;
+
+        // ensure all files have unique IDs
+        this.files.subscribe((files) => { files.filter(f => !f.id).forEach(f => f.id = randomID()); return files });
     }
 
     addFiles(...files: Array<any>) {
@@ -74,19 +96,40 @@ export class Folder {
         this.files.set([]);
     }
 
-    getFolder(folderName: string, root?: PKZ|DAT) {
+    getFolder(folderName: string, createIfNotExist=true, root?: PKZ|DAT) {
         let folders = get(this.files).filter((file) => file instanceof Folder);
         for (let i = 0; i < folders.length; i++) {
             if (folders[i].name == folderName) {
                 return folders[i];
             }
+            let innerResults = folders[i].getFolder(folderName, false);
+            if (innerResults) return innerResults;
         }
+
+        if (!createIfNotExist) return null;
 
         // no folder; create it
         let folder = new Folder(folderName, root);
         this.addFiles(folder);
         return folder;
     }
+
+    getFolderByFile(file: any) {
+        function parseFolder(folder: Folder) {
+            let files = get(folder.files);
+            for (let i = 0; i < files.length; i++) {
+                if (fileEquality(files[i], file)) {
+                    return folder;
+                } else if (files[i] instanceof Folder) {
+                    let result = parseFolder(files[i])
+                    if (result) return result; 
+                }
+            }
+            return null;
+        }
+        return parseFolder(this);
+    }
+
 
     /**
      * Searches in a folder for a filename.
@@ -113,13 +156,16 @@ export class Folder {
     /**
      * Checks recursively if a file is in the folder or any of its subfolders.
      */
-    includes(file: any) {
+    includes(file: any|string) {
         let ctx = this;
-        for (let i = 0; i < get(ctx.files).length; i++) {
-            let item = get(ctx.files)[i];
-            if (item === file) return true;
+        let files = get(ctx.files);
+        for (let i = 0; i < files.length; i++) {
+            let item = files[i];
+            if ((typeof file === "string" && item.name === file) ||
+                (typeof file !== "string" && fileEquality(item, file))
+            ) return true;
             if (item instanceof Folder) {
-                if (item.includes(file)) return true;
+                return item.includes(file);
             }
         }
         return false;
@@ -137,7 +183,7 @@ export class Folder {
             for (let i = 0; i < files.length; i++) {
                 if (files[i] === original) {
                     folder.files.update((all) => all.map((value) => {
-                        if (value === original) {
+                        if (fileEquality(value, original)) {
                             return replacement;
                         }
                         return value;
@@ -252,7 +298,8 @@ export default class FileHandler extends Folder {
                     break;
                 // --- DAT/DTT (pretty much everything)
                 case "folder/dat":
-                    extracted = await DAT.extract(file.file, file.name);
+                    // This DAT may be extracted using a visualizer class, such as quests or events
+                    extracted = await (resolveFile(file.name)).extract(file.file, file.name);
                     if (print) addToast({
                         title: "Extracted DAT",
                         message: `Extracted ${extracted.files.length} files from ${file.name}.`,

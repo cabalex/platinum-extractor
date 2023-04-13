@@ -1,6 +1,7 @@
 <script lang="ts">
     import { afterUpdate } from 'svelte';
     import { slide } from "svelte/transition";
+    import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
     import './File.css';
     import { readableBytes } from "../../FileHandler";
     import { loadedFile, searchedFile, settings } from "../Main/MainStore";
@@ -109,7 +110,7 @@
     bind:this={elem}
     class:modified={file.modified}
     class:open={files && $files.length && showContents}
-    class:active={$loadedFile == file || active || $searchedFile == file}
+    class:active={$loadedFile == file || active || $searchedFile == file || ($loadedFile === file.root)}
     class:folder={$files && typeof $files.length === "number"}
 >
     <div
@@ -124,6 +125,12 @@
     </div>
     {#if ($files && $files.length && showContents)}
     <div class="contents" transition:slide|local={{ duration: 200 }} >
+        {#if file.root && file.root.visualizer}
+        <button class="visualizerBtn" title={file.root.visualizer.actionTitle}>
+            {file.root.visualizer.actionText}
+            <OpenInNew />
+        </button>
+        {/if}
         {#each $files as subfile}
         {#key `${subfile.name}-${subfile.isPartial}`}
         <svelte:self fileHandler={fileHandler} file={subfile} />

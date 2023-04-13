@@ -6,6 +6,7 @@
     import Download from 'svelte-material-icons/Download.svelte';
     import { loadedFile } from '../lib/Main/MainStore';
     import { addToast } from '../lib/Toasts/ToastStore';
+    import Loading from '../assets/Loading.svelte';
 
     let openTab = 'textures';
 
@@ -13,11 +14,15 @@
     export let ext;
     let textureContainer;
     let wtpFile = null;
+    let isLoading = true;
     let loaded = $loadedFile.textures.length ? $loadedFile.textures[0] : null;
     let canvas = null;
 
     $: {
-        let results = fileHandler.search($loadedFile.name.replace('.wta', '.wtp'));
+        let folder = fileHandler.getFolderByFile($loadedFile);
+        let newFolder = fileHandler.getFolder(folder.name.replace('.dat', '.dtt'), false);
+        let wtpName = $loadedFile.name.replace('.wta', '.wtp');
+        let results = [...folder.search(wtpName), ...(newFolder?.search(wtpName) || [])];
         if (results.length) {
             wtpFile = results[0]
 
@@ -46,11 +51,18 @@
             return;
         }
 
-        canvas = texture.load(await wtpFile.getArrayBuffer());
-
-        textureContainer.appendChild(canvas);
-
         loaded = texture;
+        isLoading = true;
+
+        // Ensure the loading icon appears before we block the page
+        setTimeout(async () => {
+            canvas = texture.load(await wtpFile.getArrayBuffer());
+
+            textureContainer.appendChild(canvas);
+
+            isLoading = false;
+        }, 0)
+        
     }
 
     async function downloadTexture(texture: any) {
@@ -78,7 +90,7 @@
 
 <div class="editor wtaViewer">
     <main>
-        <div class="texture" bind:this={textureContainer}>
+        <div class="texture" bind:this={textureContainer} style={`aspect-ratio: ${loaded.width} / ${loaded.height}`}>
             {#if !canvas}
             <img src="texture-unavailable.png" alt="Texture" />
             {/if}
@@ -98,7 +110,11 @@
             <h3>Textures ({$loadedFile.textures.length})</h3>
             <VirtualList height="calc(100vh - 90px)" items={$loadedFile.textures} let:item={item}>
                 <button class="textureItem" class:active={loaded === item} on:click={() => loadTexture(item)}>
+                    {#if loaded === item && isLoading}
+                    <Loading />
+                    {:else}
                     <Image />
+                    {/if}
                     <div class="info">
                         <h4 class="name">{item.identifier}</h4>
                         <span class="format">{item.width}x{item.height} - {item._format || `⚠ ??? (0x${item.format.toString(16)})`}</span>

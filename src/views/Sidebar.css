@@ -78,7 +78,10 @@ main aside h3 {
 }
 main .texture {
     position: relative;
-    width: min(100%, calc(100vh - 20px));
+    max-height: calc(100% - 20px);
+    display: inline-block;
+    object-fit: contain;
+    aspect-ratio: 1 / 1;
     
     margin: 20px;
     margin-right: 5px;
@@ -95,5 +98,7 @@ main .texture {
 }
 main .texture img, main .texture canvas {
     width: min(100%, calc(100vh - 20px));
+    height: min(100%, calc(100vh - 20px));
+    max-height: min(100%, calc(100vh - 20px));
     object-fit: contain;
 }
