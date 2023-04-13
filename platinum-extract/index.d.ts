@@ -98,6 +98,10 @@ declare module "games/Global/BXM" {
         data: BXMNode;
         constructor(name: string, size: number);
         toString(): string;
+        /**
+         * Loads a stringified XML into the BXM object.
+         * Warning: replaces all contents inside the BXM!
+         */
         fromString(xml: string): void;
         getArrayBuffer(): Promise<ArrayBuffer>;
         private parseXML;
@@ -195,16 +199,50 @@ declare module "games/AstralChain/tools/tegrax1swizzle" {
         BC4_SNORM: number[];
         BC6H_UF16: number[];
         ASTC_4x4_UNORM: number[];
+        ASTC_6x6_UNORM: number[];
         ASTC_8x8_UNORM: number[];
         ASTC_4x4_SRGB: number[];
+        ASTC_6x6_SRGB: number[];
         ASTC_8x8_SRGB: number[];
     };
     export function getFormatTable(_format: string): any;
     export function deswizzle(width: number, height: number, depth: number, blkWidth: number, blkHeight: number, blkDepth: number, roundPitch: number, bpp: number, tileMode: number, size_range: number, data: ArrayBuffer): ArrayBufferLike;
     export function swizzle(width: number, height: number, depth: number, blkWidth: number, blkHeight: number, blkDepth: number, roundPitch: number, bpp: number, tileMode: number, size_range: number, data: ArrayBuffer): ArrayBufferLike;
     export function getAddrBlockLinear(x: number, y: number, image_width: number, bytes_per_pixel: number, base_address: number, block_height: number): number;
+    /**
+     * Unswizzles an image and returns an ArrayBuffer containing the image data.
+     * @param format The stringified format of the image. (e.g. "ASTC_4x4_UNORM")
+     * @param width Image width, in pixels.
+     * @param height Image height, in pixels.
+     * @param depth Image depth. Usually 1.
+     * @param arrayCount The array count of the texture.
+     * @param mipCount Number of mipmaps.
+     * @param imageData The image data, as an ArrayBuffer.
+     * @param blockHeightLog2 The base 2 log of the block height. (e.g. this.textureLayout & 7)
+     * @param target (optional) Leave this as 1.
+     * @param linearTileMode (optional) Whether to use LINEAR tile mode. Leave this as false.
+     * @returns ArrayBuffer of the unswizzled image, or false if unswizzling failed.
+     */
     export function loadImageData(format: string, width: number, height: number, depth: number, arrayCount: number, mipCount: number, imageData: ArrayBuffer, blockHeightLog2: number, target?: number, linearTileMode?: boolean): false | ArrayBuffer;
+    /**
+     * Swizzles an image and returns an ArrayBuffer containing the image data.
+     * @param format The stringified format of the image. (e.g. "ASTC_4x4_UNORM")
+     * @param width Image width, in pixels.
+     * @param height Image height, in pixels.
+     * @param depth Image depth. Usually 1.
+     * @param arrayCount The array count of the texture.
+     * @param mipCount Number of mipmaps.
+     * @param imageData The image data, as an ArrayBuffer.
+     * @param blockHeightLog2 The base 2 log of the block height. (e.g. this.textureLayout & 7)
+     * @param target (optional) Leave this as 1.
+     * @param linearTileMode (optional) Whether to use LINEAR tile mode. Leave this as false.
+     * @returns ArrayBuffer of the swizzled image, or false if swizzling failed.
+     */
     export function compressImageData(format: string, width: number, height: number, depth: number, arrayCount: number, mipCount: number, imageData: ArrayBuffer, blockHeightLog2: number, target?: number, linearTileMode?: boolean): false | ArrayBuffer;
+}
+declare module "games/AstralChain/tools/ASTC" {
+    export function addASTCHeader(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer): ArrayBufferLike;
+    export function loadASTC(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer): HTMLCanvasElement;
 }
 declare module "games/AstralChain/tools/DDS" {
     export function addDDSHeader(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer): ArrayBufferLike;
@@ -230,6 +268,7 @@ declare module "games/Global/WTA" {
         textureLayout2: number;
         arrayCount: number;
         constructor(identifier: number, wtpOffset: number, wtpSize: number, unknownArrayValue: number);
+        get game(): "ASTRALCHAIN" | "NIERAUTOMATASWITCH" | "NIERAUTOMATA" | undefined;
         get _format(): any;
         get _type(): string;
         /**
@@ -338,21 +377,11 @@ declare module "tools/defineFile" {
     export default function defineFile(filename: string): "text/xml" | "unknown" | "text/csv" | "localization/bin" | "localization/mcd" | "folder/dat" | "folder/pkz" | "folder/cpk" | "texture/wta" | "texture/wtp" | "texture/wtb" | "model/wmb" | "model/col" | "animation/mot" | "audio/wem" | "audio/bnk" | "audio/wwi" | "audio/wai" | "ruby/rbd" | "ui/uid" | "ui/uvd";
 }
 declare module "tools/resolveFile" {
-    import PKZ from "games/AstralChain/PKZ";
-    import BXM from "games/Global/BXM";
-    import CSV from "games/Global/CSV";
-    import DAT from "games/Global/DAT";
-    import MCD from "games/Global/MCD";
-    import WTA from "games/Global/WTA";
-    import WTP from "games/Global/WTP";
-    import CPK from "games/NieR/CPK";
     /**
      * Resolves a file to its respective class.
      * @param filename The filename to check.
      */
-    export default function resolveFile(filename: string): typeof PKZ | typeof BXM | typeof CSV | typeof MCD | typeof WTA | typeof WTP | typeof CPK | typeof DAT | {
-        extract: () => null;
-    };
+    export default function resolveFile(filename: string): any;
 }
 declare module "games/Global/DAT" {
     import PlatinumFile from "games/Global/PlatinumFile";
@@ -390,6 +419,18 @@ declare module "index" {
     export { default as defineFile } from "tools/defineFile";
     export { default as resolveFile } from "tools/resolveFile";
 }
+declare module "games/AstralChain/AstralChainQuest" {
+    import DAT from "games/Global/DAT";
+    export default class AstralChainQuest extends DAT {
+        data: any;
+        visualizer: {
+            actionText: string;
+            actionTitle: string;
+        };
+        constructVisualizer(): Promise<void>;
+        parse(): void;
+    }
+}
 declare module "games/NieR/CPK_old" {
     import PlatinumFile from "games/Global/PlatinumFile";
     export class CPKFile extends PlatinumFile {
@@ -425,54 +466,3 @@ declare module "games/NieR/CPK_old" {
         repack(): Promise<boolean>;
     }
 }
-declare const formatTable: {
-    R8G8B8A8_UNORM: number[];
-    BC1_UNORM: number[];
-    BC2_UNORM: number[];
-    BC3_UNORM: number[];
-    BC4_UNORM: number[];
-    BC1_UNORM_SRGB: number[];
-    BC2_UNORM_SRGB: number[];
-    BC3_UNORM_SRGB: number[];
-    BC4_SNORM: number[];
-    BC6H_UF16: number[];
-    ASTC_4x4_UNORM: number[];
-    ASTC_6x6_UNORM: number[];
-    ASTC_8x8_UNORM: number[];
-    ASTC_4x4_SRGB: number[];
-    ASTC_6x6_SRGB: number[];
-    ASTC_8x8_SRGB: number[];
-};
-declare const formats: {
-    37: string;
-    66: string;
-    67: string;
-    68: string;
-    69: string;
-    70: string;
-    71: string;
-    72: string;
-    73: string;
-    80: string;
-    45: string;
-    56: string;
-    58: string;
-    121: string;
-    128: string;
-    135: string;
-    142: string;
-    125: string;
-    139: string;
-};
-declare function getFormatTable(_format: string): any;
-declare function getFormatByIndex(_format: number): any;
-declare function pow2_round_up(x: number): number;
-declare function DIV_ROUND_UP(n: number, d: number): number;
-declare function subArray(data: any[], offset: number, length: number): any[];
-declare function round_up(x: number, y: number): number;
-declare function _swizzle(width: number, height: number, depth: number, blkWidth: number, blkHeight: number, blkDepth: number, roundPitch: number, bpp: number, tileMode: number, blockHeightLog2: number, data: any, toSwizzle: any): Uint8Array;
-declare function deswizzle(width: number, height: number, depth: number, blkWidth: number, blkHeight: number, blkDepth: number, roundPitch: number, bpp: number, tileMode: number, size_range: number, data: any): Uint8Array;
-declare function swizzle(width: number, height: number, depth: number, blkWidth: number, blkHeight: number, blkDepth: number, roundPitch: number, bpp: number, tileMode: number, size_range: number, data: any): Uint8Array;
-declare function getAddrBlockLinear(x: number, y: number, image_width: number, bytes_per_pixel: number, base_address: number, block_height: number): number;
-declare function loadImageData(format: string, width: number, height: number, depth: number, arrayCount: number, mipCount: number, imageData: any, blockHeightLog2: number, target?: number, linearTileMode?: boolean): false | Uint8Array;
-declare function compressImageData(format: string, width: number, height: number, depth: number, arrayCount: number, mipCount: number, imageData: any, blockHeightLog2: number, target?: number, linearTileMode?: boolean): false | Uint8Array;
