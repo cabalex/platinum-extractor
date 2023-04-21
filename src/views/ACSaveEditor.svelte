@@ -88,6 +88,7 @@
                 <h4>
                     <img src={item.cost === 3 ? Ability3 : item.cost === 2 ? Ability2 : Ability1} width="32px" />
                     <AbilitySelect bind:value={$loadedFile.abilities[index].id} />
+                    <div style="flex-grow: 1" />
                     <DeleteBtn onClick={deleteAbility.bind(null, index)} />
                 </h4>
                 {#if index === 0}
