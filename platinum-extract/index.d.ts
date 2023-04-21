@@ -186,7 +186,145 @@ declare module "games/Global/MCD" {
         static repack(chars: Char[], events: Event[], charGraphs: CharGraph[], specialGraphs: SpecialGraph[], usedEvents: UsedEvent[]): Promise<ArrayBuffer>;
     }
 }
-declare module "games/AstralChain/tools/tegrax1swizzle" {
+declare module "tools/gameSupport" {
+    export enum games {
+        PlatinumGeneric = 0,
+        AstralChain = 1,
+        NieRReplicant = 2,
+        NieRAutomata = 3,
+        NieRAutomataSwitch = 4,
+        MetalGearRisingRevengence = 5,
+        Bayonetta1PC = 6,
+        Bayonetta1Switch = 7,
+        Bayonetta2WiiU = 8,
+        Bayonetta2Switch = 9,
+        Bayonetta3 = 10,
+        StarFoxZero = 11,
+        StarFoxGuard = 12,
+        TransformersDevastation = 13,
+        Vanquish = 14,
+        Wonderful101 = 15,
+        Wonderful101Remastered = 16,
+        Wonderful101RemasteredSwitch = 17
+    }
+    export enum platforms {
+        PC = 0,
+        Switch = 1,
+        WiiU = 2
+    }
+    const gameSupport: {
+        0: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        1: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        2: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        3: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        4: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        5: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        6: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        7: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        8: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        9: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        10: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        11: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        12: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        13: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        14: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        15: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        16: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+        17: {
+            platform: platforms;
+            name: string;
+            deswizzlingRequired: boolean;
+            astc: boolean;
+        };
+    };
+    export default gameSupport;
+}
+declare module "games/SwitchGlobal/tegrax1swizzle" {
     export const formatTable: {
         R8G8B8A8_UNORM: number[];
         BC1_UNORM: number[];
@@ -240,15 +378,34 @@ declare module "games/AstralChain/tools/tegrax1swizzle" {
      */
     export function compressImageData(format: string, width: number, height: number, depth: number, arrayCount: number, mipCount: number, imageData: ArrayBuffer, blockHeightLog2: number, target?: number, linearTileMode?: boolean): false | ArrayBuffer;
 }
-declare module "games/AstralChain/tools/ASTC" {
+declare module "games/SwitchGlobal/ASTC" {
     export function addASTCHeader(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer): ArrayBufferLike;
     export function loadASTC(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer): HTMLCanvasElement;
 }
-declare module "games/AstralChain/tools/DDS" {
+declare module "games/SwitchGlobal/DDS" {
+    /**
+     * Prepends a DDS header to DDS texture data, for exporting.
+     * @param format The format of the texture, e.g. "BC1_UNORM".
+     * @param width Texture width
+     * @param height Texture height
+     * @param depth Texture depth (usually 1)
+     * @param textureData An ArrayBuffer containing the texture data.
+     * @returns An ArrayBuffer containing the complete file (both header and data).
+     */
     export function addDDSHeader(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer): ArrayBufferLike;
+    /**
+     * Loads a DDS texture into a canvas element. Renders using WebGL.
+     * @param format The format of the texture, e.g. "BC1_UNORM".
+     * @param width Texture width
+     * @param height Texture height
+     * @param depth Texture depth (usually 1)
+     * @param textureData An ArrayBuffer containing the texture data.
+     * @returns A canvas element containing the texture.
+     */
     export function loadDDS(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer): HTMLCanvasElement;
 }
 declare module "games/Global/WTA" {
+    import { games } from "tools/gameSupport";
     import PlatinumFile from "games/Global/PlatinumFile";
     export class WTATexture {
         identifier: string;
@@ -268,7 +425,7 @@ declare module "games/Global/WTA" {
         textureLayout2: number;
         arrayCount: number;
         constructor(identifier: number, wtpOffset: number, wtpSize: number, unknownArrayValue: number);
-        get game(): "ASTRALCHAIN" | "NIERAUTOMATASWITCH" | "NIERAUTOMATA" | undefined;
+        get game(): games;
         get _format(): any;
         get _type(): string;
         /**
@@ -282,6 +439,11 @@ declare module "games/Global/WTA" {
          * @returns [texture, offset]
          */
         static extract(view: DataView, offset: number, wtpOffset: number, wtpSize: number, identifier: number, unknownArrayValue: number): [WTATexture, number];
+        private getTextureData;
+        /**
+         * Loads a texture into a canvas.
+         * @returns
+         */
         load(wtpTexture: ArrayBuffer): HTMLCanvasElement;
         /**
          * Returns an ArrayBuffer of the texture as a file.
@@ -374,7 +536,7 @@ declare module "tools/defineFile" {
      * - animation: animation/mot
      * - unknown: If we don't know what it is.
      */
-    export default function defineFile(filename: string): "text/xml" | "unknown" | "text/csv" | "localization/bin" | "localization/mcd" | "folder/dat" | "folder/pkz" | "folder/cpk" | "texture/wta" | "texture/wtp" | "texture/wtb" | "model/wmb" | "model/col" | "animation/mot" | "audio/wem" | "audio/bnk" | "audio/wwi" | "audio/wai" | "ruby/rbd" | "ui/uid" | "ui/uvd";
+    export default function defineFile(filename: string): "text/xml" | "unknown" | "save/astralchain_slot" | "save/astralchain_game" | "text/csv" | "localization/bin" | "localization/mcd" | "folder/dat" | "folder/pkz" | "folder/cpk" | "texture/wta" | "texture/wtp" | "texture/wtb" | "model/wmb" | "model/col" | "animation/mot" | "audio/wem" | "audio/bnk" | "audio/wwi" | "audio/wai" | "ruby/rbd" | "ui/uid" | "ui/uvd";
 }
 declare module "tools/resolveFile" {
     /**
@@ -409,11 +571,59 @@ declare module "games/Global/DAT" {
         }[], datType?: 'DAT' | 'DTT', game?: 'astral-chain' | 'nier-automata-switch'): Promise<ArrayBuffer>;
     }
 }
+declare module "games/AstralChain/database" {
+    export const items: {};
+    export const abilities: any;
+    export const subabilities: any;
+    export function getAbility(id: number, subability?: boolean, value?: number): any;
+    export const enemies: any;
+}
+declare module "games/AstralChain/AstralChainSlotData" {
+    import PlatinumFile from "games/Global/PlatinumFile";
+    class Item {
+        constructor();
+        export(): ArrayBuffer;
+    }
+    /**
+     * Astral Chain Ability. 36 bytes.
+     * Abilites start at 0x97000.
+     */
+    class Ability {
+        id: number;
+        cost: number;
+        unk1: number;
+        unk2: number;
+        bonusAbility1Id: number;
+        bonusAbility1Value: number;
+        bonusAbility2Id: number;
+        bonusAbility2Value: number;
+        unk3: number;
+        constructor(buffer: ArrayBuffer);
+        get name(): any;
+        repack(): ArrayBufferLike;
+    }
+    export default class AstralChainSlotData extends PlatinumFile {
+        playtime: number;
+        lastSaved: Date;
+        money: number;
+        geneCodes: number;
+        username: string;
+        items: Item[];
+        abilities: Ability[];
+        arrayBuffer: ArrayBuffer;
+        constructor(root: ArrayBuffer, slotId: number);
+        addAbility(): void;
+        static extract(fileBuffer: ArrayBuffer | File, name: string): Promise<AstralChainSlotData>;
+        repack(): Promise<ArrayBufferLike>;
+    }
+}
 declare module "index" {
     export { default as DAT } from "games/Global/DAT";
     export { default as BXM } from "games/Global/BXM";
     export { default as CSV } from "games/Global/CSV";
     export { default as PKZ } from "games/AstralChain/PKZ";
+    export { default as AstralChainSlotData } from "games/AstralChain/AstralChainSlotData";
+    export { abilities as AstralChainAbilities, subabilities as AstralChainSubAbilities, getAbility as AstralChainGetAbility, enemies as AstralChainEm } from "games/AstralChain/database";
     export { default as CPK } from "games/NieR/CPK";
     export { default as readFile } from "tools/readFile";
     export { default as defineFile } from "tools/defineFile";
