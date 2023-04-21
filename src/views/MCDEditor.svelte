@@ -34,7 +34,7 @@
         
         if (!wtpFile) {
             let wtpName = $loadedFile.name.replace('.wta', '.wtp');
-            let results = [...folder.search(wtpName), ...(newFolder?.search(wtpName) || [])];
+            let results = [...folder.search(wtpName, true, true), ...(newFolder?.search(wtpName, true, true) || [])];
             if (results.length) {
                 wtpFile = results[0];
             } else {
@@ -50,7 +50,7 @@
 
         if (!wtaFile) {
             let wtaName = $loadedFile.name.replace('.mcd', '.wta');
-            let results = [...folder.search(wtaName), ...(newFolder?.search(wtaName) || [])];
+            let results = [...folder.search(wtaName, true, true), ...(newFolder?.search(wtaName, true, true) || [])];
             if (results.length) {
                 wtaFile = results[0];
             } else {

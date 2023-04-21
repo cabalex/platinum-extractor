@@ -137,13 +137,13 @@ export class Folder {
      * @param recursive Whether to check subfolders or not.
      * @returns 
      */
-    search(query: string, recursive: boolean = true) {
+    search(query: string, recursive: boolean = true, exact: boolean = false) {
         let ctx = this;
         let results = [];
         let files = get(ctx.files);
         for (let i = 0; i < files.length; i++) {
             let file = files[i];
-            if (file.name.toLowerCase().includes(query.toLowerCase())) {
+            if (file.name === query || (!exact && file.name.toLowerCase().includes(query.toLowerCase()))) {
                 results.push(file);
             }
             if (file instanceof Folder && recursive) {

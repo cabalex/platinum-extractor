@@ -5,7 +5,11 @@
     import Home from "svelte-material-icons/Home.svelte";
     import Alert from "svelte-material-icons/Alert.svelte";
     import ContentSave from "svelte-material-icons/ContentSave.svelte";
+    import PlusBox from "svelte-material-icons/PlusBox.svelte";
     import './Sidebar.css';
+    import Ability1 from "../assets/ac-ability-1.png"
+    import Ability2 from "../assets/ac-ability-2.png"
+    import Ability3 from "../assets/ac-ability-3.png"
     import VirtualList from "../assets/VirtualList.svelte";
     import AbilitySelect from "./ACSaveEditor/AbilitySelect.svelte";
     import { addToast } from "../lib/Toasts/ToastStore";
@@ -82,10 +86,8 @@
         <VirtualList height="calc(100vh - 50px)" items={$loadedFile.abilities} let:item let:index>
             <div class="ability">
                 <h4>
+                    <img src={item.cost === 3 ? Ability3 : item.cost === 2 ? Ability2 : Ability1} width="32px" />
                     <AbilitySelect bind:value={$loadedFile.abilities[index].id} />
-                    - Ability cost:
-                    <input min={1} max={5} type="number" bind:value={$loadedFile.abilities[index].cost}>
-                    <div style="flex-grow: 1" />
                     <DeleteBtn onClick={deleteAbility.bind(null, index)} />
                 </h4>
                 {#if index === 0}
@@ -94,10 +96,12 @@
                     Changing this ability's main type may not work (first ability obtained).
                 </div>
                 {/if}
+                <p>Ability cost: <input min={1} max={5} type="number" bind:value={$loadedFile.abilities[index].cost}></p>
                 <p>unknown 1: <input type="number" bind:value={$loadedFile.abilities[index].unk1}></p>
                 <p>unknown 2: <input type="number" bind:value={$loadedFile.abilities[index].unk2}></p>
                 <p>unknown 3: <input type="number" bind:value={$loadedFile.abilities[index].unk3}></p>
-                <p>
+                <div class="subability">
+                    <PlusBox width="32px" height="32px" />
                     <AbilitySelect bind:value={$loadedFile.abilities[index].bonusAbility1Id} stockAbilities={false} />
                     <input type="number" step={1} min={-2147483648} max={2147483647} bind:value={$loadedFile.abilities[index].bonusAbility1Value} />
                     {AstralChainGetAbility(
@@ -105,8 +109,9 @@
                         true,
                         $loadedFile.abilities[index].bonusAbility1Value
                     )}
-                </p>
-                <p>
+                </div>
+                <div class="subability">
+                    <PlusBox width="32px" height="32px" />
                     <AbilitySelect bind:value={$loadedFile.abilities[index].bonusAbility2Id} stockAbilities={false} />
                     <input type="number" step={1} min={-2147483648} max={2147483647} bind:value={$loadedFile.abilities[index].bonusAbility2Value} />
                     {AstralChainGetAbility(
@@ -114,7 +119,7 @@
                         true,
                         $loadedFile.abilities[index].bonusAbility2Value
                     )}
-                </p>
+                </div>
             </div>
             {#if item === $loadedFile.abilities[$loadedFile.abilities.length - 1]}
             <button class="add" on:click={addAbility}>
@@ -170,6 +175,12 @@
         margin: 5px;
         background-color: #333;
         border-radius: 5px;
+    }
+    .subability {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px;
     }
     .add {
         width: 100%;

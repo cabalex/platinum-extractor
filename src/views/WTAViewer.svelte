@@ -22,7 +22,7 @@
         let folder = fileHandler.getFolderByFile($loadedFile);
         let newFolder = fileHandler.getFolder(folder.name.replace('.dat', '.dtt'), false);
         let wtpName = $loadedFile.name.replace('.wta', '.wtp');
-        let results = [...folder.search(wtpName), ...(newFolder?.search(wtpName) || [])];
+        let results = [...folder.search(wtpName, true, true), ...(newFolder?.search(wtpName, true, true) || [])];
         if (results.length) {
             wtpFile = results[0]
 
