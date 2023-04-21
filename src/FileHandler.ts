@@ -301,36 +301,44 @@ export default class FileHandler extends Folder {
                     // This DAT may be extracted using a visualizer class, such as quests or events
                     extracted = await (resolveFile(file.name)).extract(file.file, file.name);
                     if (print) addToast({
-                        title: "Extracted DAT",
-                        message: `Extracted ${extracted.files.length} files from ${file.name}.`,
+                        title: `Extracted ${extracted.constructor.name}`,
+                        message: extracted.files ? `Extracted ${extracted.files.length} files from ${file.name}.` : `Extracted ${file.name}.`,
                         type: "success",
                         timeout: 10000
                     })
                     if (returnInstance) return extracted;
-                    
-                    let folder = new Folder(file.name, extracted);
-                    if (extracted.files.length > 0 || file.file['byteLength'] === 64) {
-                        folder.addFiles(...extracted.files)
-                        if (replace) {
-                            this.replaceFile(replace, folder);
+
+                    if (extracted.files) {
+                        let folder = new Folder(file.name, extracted);
+                        if (extracted.files.length > 0 || file.file['byteLength'] === 64) {
+                            folder.addFiles(...extracted.files)
+                            if (replace) {
+                                this.replaceFile(replace, folder);
+                            } else {
+                                this.set([...get(this.files), folder]);
+                            }
                         } else {
-                            this.set([...get(this.files), folder]);
+                            addToast({
+                                title: `Couldn't extract DAT`,
+                                message: `Couldn't find any files in ${file.name} (we might have extracted it wrong?)`,
+                                type: "danger",
+                                timeout: 10000
+                            })
+                        }
+                        if (file.file['byteLength'] === 64) {
+                            addToast({
+                                title: `DAT empty`,
+                                message: `${file.name} doesn't have any files in it.`,
+                                type: "warning",
+                                timeout: 10000
+                            })
                         }
                     } else {
-                        addToast({
-                            title: `Couldn't extract DAT`,
-                            message: `Couldn't find any files in ${file.name} (we might have extracted it wrong?)`,
-                            type: "danger",
-                            timeout: 10000
-                        })
-                    }
-                    if (file.file['byteLength'] === 64) {
-                        addToast({
-                            title: `DAT empty`,
-                            message: `${file.name} doesn't have any files in it.`,
-                            type: "warning",
-                            timeout: 10000
-                        })
+                        if (replace) {
+                            this.replaceFile(replace, extracted);
+                        } else {
+                            this.set([...get(this.files), extracted]);
+                        }
                     }
                     break;
                 default:

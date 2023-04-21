@@ -5,7 +5,7 @@
     import TextBox from "svelte-material-icons/TextBox.svelte";
     import { loadedFile } from "../lib/Main/MainStore";
     import { addToast } from "../lib/Toasts/ToastStore";
-  import { get } from "svelte/store";
+    import { get } from "svelte/store";
 
     console.log($loadedFile.data);
 
@@ -32,7 +32,6 @@
         let folder = fileHandler.getFolderByFile($loadedFile);
         let newFolder = fileHandler.getFolder(folder.name.replace('.dat', '.dtt'), false);
         
-        console.log("done 1")
         if (!wtpFile) {
             let wtpName = $loadedFile.name.replace('.wta', '.wtp');
             let results = [...folder.search(wtpName), ...(newFolder?.search(wtpName) || [])];
@@ -48,20 +47,23 @@
                 return
             }
         }
-        console.log("done 2")
-        let wtaName = $loadedFile.name.replace('.mcd', '.wta');
-        results = [...folder.search(wtaName), ...(newFolder?.search(wtaName) || [])];
-        if (results.length) {
-            wtaFile = results[0];
-        } else {
-            addToast({
-                type: 'danger',
-                title: `WTA not found`,
-                message: `${$loadedFile.name.replace('.wta', '.wtp')} wasn't found in your loaded directory (did you forget to open a .DTT?).\nWTA files need WTP texture data in order to function.`,
-                timeout: 10000
-            })
-            return
+
+        if (!wtaFile) {
+            let wtaName = $loadedFile.name.replace('.mcd', '.wta');
+            let results = [...folder.search(wtaName), ...(newFolder?.search(wtaName) || [])];
+            if (results.length) {
+                wtaFile = results[0];
+            } else {
+                addToast({
+                    type: 'danger',
+                    title: `WTA not found`,
+                    message: `${$loadedFile.name.replace('.wta', '.wtp')} wasn't found in your loaded directory (did you forget to open a .DTT?).\nWTA files need WTP texture data in order to function.`,
+                    timeout: 10000
+                })
+                return
+            }
         }
+
         if (wtaFile.textures.length && $loadedFile.data.charGraphs.length) {
             let textureID = $loadedFile.data.charGraphs[0].textureID.toString(16);
             let wtaTexture;

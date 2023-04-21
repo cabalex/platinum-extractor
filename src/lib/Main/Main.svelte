@@ -10,6 +10,7 @@
     import Unloaded from "../../views/Unloaded.svelte";
     import MCDEditor from "../../views/MCDEditor.svelte";
     import WTAViewer from "../../views/WTAViewer.svelte";
+    import ACSaveEditor from "../../views/ACSaveEditor.svelte";
 
     export let fileHandler;
 
@@ -47,6 +48,8 @@
                     timeout: 10000
                 })
                 return Unloaded;
+            case 'save/astralchain_slot':
+                return ACSaveEditor;
             default:
                 addToast({
                     type: 'danger',

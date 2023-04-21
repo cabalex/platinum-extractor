@@ -46,6 +46,20 @@ h1 {
 .card {
   padding: 2em;
 }
+.warning {
+  border: 1px solid gold;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin: 5px 0;
+
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+.warning svg {
+  transform: scale(1.5);
+}
 html, body {
   height: 100%;
 }

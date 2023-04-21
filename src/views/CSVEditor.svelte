@@ -108,7 +108,7 @@
         <tr class="row contentRow">
             <th class="cell">{i + 1}</th>
             {#each row as cell, j}
-                <td contenteditable spellcheck="false" class="cell contentCell" style={`width: ${widths[j]}em; ` + (customColors.get(`${i}-${j}`) || "")}>
+                <td translate="yes" contenteditable spellcheck="false" class="cell contentCell" style={`width: ${widths[j]}em; ` + (customColors.get(`${i}-${j}`) || "")}>
                     {cell}
                 </td>
             {/each}

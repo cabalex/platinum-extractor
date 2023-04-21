@@ -102,7 +102,7 @@
             <button class="repack" disabled={true}>View only</button>
         </header>
         <div class="tabs">
-            <button class="tab" class:active={openTab === "textures"} on:click={() => openTab = "texutres"}>
+            <button class="tab" class:active={openTab === "textures"} on:click={() => openTab = "textures"}>
                 <ImageMultiple />
             </button>
         </div>
