@@ -16,9 +16,9 @@
 
   --sidebar-dark: #363636;
   --sidebar-light: #434343;
-  --success: #57F287;
-  --danger: #ED4245;
-  --warning: #FEE75C;
+  --success: #57f287;
+  --danger: #ed4245;
+  --warning: #fee75c;
 }
 
 a {
@@ -28,6 +28,17 @@ a {
 }
 a:hover {
   color: #535bf2;
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+    background: #777;
 }
 
 body {
@@ -46,7 +57,7 @@ h1 {
 .card {
   padding: 2em;
 }
-.warning {
+.warning:not(.toast) {
   border: 1px solid gold;
   border-radius: 5px;
   padding: 5px 10px;
@@ -60,7 +71,8 @@ h1 {
 .warning svg {
   transform: scale(1.5);
 }
-html, body {
+html,
+body {
   height: 100%;
 }
 #app {
@@ -69,7 +81,7 @@ html, body {
   display: flex;
   flex-direction: row;
 }
-#app > main > header {
+#app main > header {
   border-bottom: 1px solid #ccc;
   padding: 10px;
   width: calc(100% - 20px);

@@ -1,6 +1,6 @@
 import './app.css'
 import App from './App.svelte'
-import { addToast } from './lib/Toasts/ToastStore'
+import { addToast } from './components/Toasts/ToastStore'
 
 const app = new App({
   target: document.getElementById('app')

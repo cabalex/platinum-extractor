@@ -11,10 +11,14 @@
   },
   "dependencies": {
     "@cabalex/platinum-extract": "file:./dist",
+    "@oneidentity/zstd-js": "^1.0.3",
     "@sveltejs/svelte-virtual-list": "^3.0.1",
+    "encoding-japanese": "^2.0.0",
     "jszip": "^3.10.1",
+    "ooz-wasm": "^1.0.1",
     "svelte-ace": "^1.0.21",
-    "svelte-material-icons": "^2.0.4"
+    "svelte-material-icons": "^2.0.4",
+    "twgl.js": "^5.3.1"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",

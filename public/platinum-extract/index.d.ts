@@ -339,9 +339,13 @@ declare module "games/SwitchGlobal/tegrax1swizzle" {
         ASTC_4x4_UNORM: number[];
         ASTC_6x6_UNORM: number[];
         ASTC_8x8_UNORM: number[];
+        ASTC_10x10_UNORM: number[];
+        ASTC_12x12_UNORM: number[];
         ASTC_4x4_SRGB: number[];
         ASTC_6x6_SRGB: number[];
         ASTC_8x8_SRGB: number[];
+        ASTC_10x10_SRGB: number[];
+        ASTC_12x12_SRGB: number[];
     };
     export function getFormatTable(_format: string): any;
     export function deswizzle(width: number, height: number, depth: number, blkWidth: number, blkHeight: number, blkDepth: number, roundPitch: number, bpp: number, tileMode: number, size_range: number, data: ArrayBuffer): ArrayBufferLike;
@@ -617,12 +621,31 @@ declare module "games/AstralChain/AstralChainSlotData" {
         repack(): Promise<ArrayBufferLike>;
     }
 }
+declare module "games/AstralChain/AstralChainGameData" {
+    import PlatinumFile from "games/Global/PlatinumFile";
+    export default class AstralChainGameData extends PlatinumFile {
+        saveFileCreated: boolean;
+        ptUltimateCheatUnlocked: boolean;
+        activeSlot: number;
+        seenIntro: boolean;
+        pictures: Array<{
+            data: ArrayBuffer;
+            url: string;
+        }>;
+        arrayBuffer: ArrayBuffer;
+        constructor(root: ArrayBuffer);
+        addPicture(): void;
+        static extract(fileBuffer: ArrayBuffer | File, name: string): Promise<AstralChainGameData>;
+        repack(): Promise<ArrayBufferLike>;
+    }
+}
 declare module "index" {
     export { default as DAT } from "games/Global/DAT";
     export { default as BXM } from "games/Global/BXM";
     export { default as CSV } from "games/Global/CSV";
     export { default as PKZ } from "games/AstralChain/PKZ";
     export { default as AstralChainSlotData } from "games/AstralChain/AstralChainSlotData";
+    export { default as AstralChainGameData } from "games/AstralChain/AstralChainGameData";
     export { abilities as AstralChainAbilities, subabilities as AstralChainSubAbilities, getAbility as AstralChainGetAbility, enemies as AstralChainEm } from "games/AstralChain/database";
     export { default as CPK } from "games/NieR/CPK";
     export { default as readFile } from "tools/readFile";
