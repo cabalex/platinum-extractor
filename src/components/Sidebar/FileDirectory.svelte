@@ -140,7 +140,7 @@
 <div class="contents" style="margin-left: 0; width: 100%">
     {#each Object.keys(tree).sort() as fileName}
         {#if tree[fileName] instanceof PlatinumFile}
-            <div class="fileName" on:click={() => openFile(tree[fileName])}>
+            <div class="fileName" on:click={() => openFile(tree[fileName])} title={fileName}>
                 <span class="icon">
                     {#if tree[fileName].unknown}
                     <img alt="file" src={`https://img.icons8.com/color/20/000000/delete-file.png`} />
@@ -157,7 +157,7 @@
 </div>
 {:else}
 <div class="directory" class:open={directoryOpen}>
-    <div class="fileName" on:click={() => directoryOpen = !directoryOpen}>
+    <div class="fileName" on:click={() => directoryOpen = !directoryOpen} title={directoryName}>
         <span class="icon">
             {#if directoryOpen}
                 <img alt="open" src="https://img.icons8.com/color/20/000000/opened-folder.png" />
@@ -183,6 +183,7 @@
                     class:active={$componentTabs[$loadedComponentIndex]?.file === tree[fileName]}
                     class:empty={tree[fileName].unknown && get(tree[fileName].data).target.byteLength === 0}
                     on:click={() => openFile(tree[fileName])}
+                    title={fileName}
                 >
                     <span class="icon">
                         {#if tree[fileName].unknown}

@@ -2,7 +2,7 @@ import { writable, type Writable } from "svelte/store";
 import Unloaded from "./Unloaded.svelte";
 import type { PlatinumFile } from "../../lib/FileHandler";
 
-interface Tab {
+export interface Tab {
     name: string;
     component: any;
     file?: any;

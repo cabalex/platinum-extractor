@@ -8,13 +8,12 @@
     export let setUnsavedChanges: (value: boolean) => {}; // Run setUnsavedChanges(true) to indicate that the file has unsaved changes
 
     export function save(): FileData|false {
-        // Whatever is returned here will update the file's data.
-        // Unsaved changes will automatically be set to false.
-        // Not able to save? Return false instead.
-        return { myData: "Hello, world! This is my modded data." };
+        return false;
     }
 </script>
 
 <div>
-    Hello world! My file name is {name} and I have {data.myData} in me.
+    <h2>You need NieR2Blender2NieR to open this file</h2>
+    <p>NieR2Blender2NieR is a Blender add-on that lets you load and edit collision files in 3D.</p>
+    <a href="https://github.com/cabalex/NieR2Blender2NieR" rel="noopener noreferrer" target="_blank">Get NieR2Blender2NieR</a>
 </div>

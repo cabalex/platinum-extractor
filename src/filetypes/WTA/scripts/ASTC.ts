@@ -1,5 +1,9 @@
 import { getFormatTable } from './tegrax1swizzle';
-import { createProgram } from 'twgl.js';
+import Module from './astc_decomp';
+
+Module.onRuntimeInitialized = () => {
+    console.log("Module initialized");
+}
 
 function getASTCHeader(format: string, width: number, height: number, depth: number) {
 
@@ -31,8 +35,8 @@ export function addASTCHeader(format: string, width: number, height: number, dep
 }
 
 // Loads an ASTC texture into a canvas element.
-export function loadASTC(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer) {
-    let canvas = document.createElement('canvas');
+export function loadASTC(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer, canvas?: HTMLCanvasElement) {
+    if (!canvas) canvas = document.createElement('canvas');
     let ctx = canvas.getContext('2d');
 
     if (!ctx) {

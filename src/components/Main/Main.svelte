@@ -53,7 +53,7 @@
         background-color: #111;
         justify-content: flex-start;
         height: 40px;
-        width: calc(100vw - 420px); /* hack so that the scrollbar will appear */
+        width: calc(100vw - 300px); /* hack so that the scrollbar will appear */
         overflow-y: auto;
     }
     .tabs::-webkit-scrollbar-thumb {

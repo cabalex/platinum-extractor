@@ -1,7 +1,7 @@
 import { concatArrayBuffer } from "../../lib/arrayBufferTools";
-import type { FileData } from "./extract";
+import type { FileData, Node } from "./extract";
 
-async function repack(data: FileData) : Promise<ArrayBuffer> {
+function repack(data: FileData) : ArrayBuffer {
     // This code is HORRIBLY MESSY and needs rewriting.
     // It's basically legacy code from the previous astral-extractor
     // that I never bothered to refactor. Oops!
@@ -29,19 +29,19 @@ async function repack(data: FileData) : Promise<ArrayBuffer> {
         dataOffsets.push(dataoff);
         return dataoffcount/2;
     }
-    function readTree(input: Element, iter: number) {
+    function readTree(input: Node, iter: number) {
         // Create NodeInfo
-        nodeInfo[iter] = [input.children.length, nodeInfo.length || 1, input.attributes.length, 0]; // last is filled in later!
+        nodeInfo[iter] = [input.children.length, nodeInfo.length || 1, Object.keys(input.attributes).length, 0]; // last is filled in later!
         let dataOffset = [];
         // create DataOffsets for name, value, and [potential] attributes
-        if (!strings.includes(input.nodeName)) strings.push(input.nodeName);
+        if (!strings.includes(input.name)) strings.push(input.name);
 
-        dataOffset.push(calculateStringsLength(strings.indexOf(input.nodeName)))
+        dataOffset.push(calculateStringsLength(strings.indexOf(input.name)))
 
-        if (input.nodeValue.toString()) {
-            if (!strings.includes(input.nodeValue.toString())) strings.push(input.nodeValue.toString());
+        if (input.value && input.value.toString()) {
+            if (!strings.includes(input.value.toString())) strings.push(input.value.toString());
 
-            dataOffset.push(calculateStringsLength(strings.indexOf(input.nodeValue.toString())))
+            dataOffset.push(calculateStringsLength(strings.indexOf(input.value.toString())))
         } else {
             dataOffset.push(0xFFFF)
         }
@@ -65,7 +65,7 @@ async function repack(data: FileData) : Promise<ArrayBuffer> {
             readTree(input.children[i], startChildren+i);
         }
     }
-    readTree(data.data.children[0], 0);
+    readTree(data.data, 0);
     // Construct the BXM file
     // BXMs are big endian!!
     function swap16(val: number) {

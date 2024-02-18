@@ -3,6 +3,7 @@
     import Delete from "svelte-material-icons/Delete.svelte";
     import FileDirectory from './FileDirectory.svelte';
     import type FileHandler from '../../lib/FileHandler';
+    import { componentTabs } from '../Main/MainStore';
 
     export let fileHandler: FileHandler;
     let fileHandlerFiles = fileHandler.files;
@@ -31,6 +32,12 @@
             $fileHandlerFiles = [];
         }
     }
+
+    function filterTabs(files: any) {
+        $componentTabs = $componentTabs.filter(tab => files.some(file => file.name === tab.name));
+    }
+
+    $: filterTabs($fileHandlerFiles);
 </script>
 
 <aside
@@ -43,7 +50,7 @@
 >
     <header>
         <a href="https://cabalex.github.io" class="logo">cabalex.github.io</a>
-        <h1>Platinum Extractor</h1>
+        <h1>Extractor</h1>
     </header>
     <div class="rootDir">
         <FileDirectory fileHandler={fileHandler} root={true} />
@@ -144,7 +151,7 @@
 
         position: relative;
         height: 100%;
-        width: 420px;
+        width: 300px;
         flex-shrink: 0;
         background-color: var(--sidebar-dark);
     }

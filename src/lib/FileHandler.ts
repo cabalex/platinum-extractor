@@ -54,9 +54,10 @@ export class PlatinumFile {
     repackable: boolean;
     unknown = false;
     icon = "file";
+    resolvedType = "unknown";
     extractFn?: (caller: PlatinumFile) => Promise<any>;
 
-    constructor(name: string, data: any, isPartial: boolean, repackable: boolean, icon?: string, extractFn?: () => Promise<any>) {
+    constructor(name: string, data: any, isPartial: boolean, repackable: boolean, resolvedType?: string, icon?: string, extractFn?: () => Promise<any>) {
         this.name = name;
         this.baseName = name.split('/').pop();
         this.data = writable(data);
@@ -64,6 +65,7 @@ export class PlatinumFile {
         this.repackable = repackable;
         if (extractFn) this.extractFn = extractFn;
         if (icon) this.icon = icon;
+        if (resolvedType) this.resolvedType = resolvedType;
 
         if (data?.name && data?.target) {
             this.unknown = true;
@@ -116,10 +118,11 @@ export default class FileHandler {
             addToast({type: 'warning', timeout: 10000, title: `Failed to open ${file.name.split("/").pop()}`, message: "I don't currently support opening this file type right now, but you can open an issue to request support!"});
             return;
         }
+
         // resolve component
-        let component = this.components[file.baseName.split('.').pop().toUpperCase()];
+        let component = this.components[file.resolvedType];
         if (!component) {
-            addToast({type: 'warning', timeout: 10000, title: `Failed to open ${file.name.split("/").pop()}`, message: "Despite an implementation existing, no component was found for this file type.\nAre you sure you should be opening this file?"});
+            addToast({type: 'warning', timeout: 10000, title: `Failed to open ${file.name.split("/").pop()}`, message: `Despite an implementation existing (${file.resolvedType}), no component was found for this file type.\nAre you sure you should be opening this file?`});
             return;
         }
 
@@ -146,10 +149,22 @@ export default class FileHandler {
         loadedComponentIndex.set(get(componentTabs).length - 1);
     }
 
-    visualizeFolder(visualizer: any, files: any, folderName: string) {
+    /**
+     * Create a tab for the given visualizer.
+     * @param visualizer
+     * @param files  The files the visualizer should visualize.
+     * @param folderName The name of the folder to visualize.
+     * @returns 
+     */
+    visualizeFolder(visualizer: any, files: PlatinumFile[], folderName: string) {
         // resolve component
         if (!visualizer.component) {
-            addToast({type: 'warning', timeout: 10000, title: `Failed to visualize folder`, message: "Despite an implementation existing, no component was found for this visualizer.\nPlease add a Svelte component to this visualizer."});
+            addToast({
+                type: 'warning',
+                timeout: 10000,
+                title: `Failed to visualize folder`,
+                message: "Despite an implementation existing, no component was found for this visualizer.\nPlease add a Svelte component to this visualizer."
+            });
             return;
         }
 
@@ -191,7 +206,7 @@ export default class FileHandler {
             files.splice(files.indexOf(caller), 1);
             files.push(
                 ...response.data.files.map(
-                    (f) => new PlatinumFile(partialFile.name + "/" + f.name, f.data, response.hasPartialFiles, response.isRepackable, response.icon)
+                    (f) => new PlatinumFile(partialFile.name + "/" + f.name, f.data, response.hasPartialFiles, response.isRepackable, f.filetype, response.icon)
                 )
             )
             this.files.set(files);
@@ -224,12 +239,12 @@ export default class FileHandler {
 
                 this.files.update(f => [...f,
                     ...response.data.files.map(
-                        (f) => new PlatinumFile(f.name, f.data, response.hasPartialFiles, response.isRepackable, response.icon, baseFn ? baseFn.bind(this, f) : undefined)
+                        (f) => new PlatinumFile(f.name, f.data, response.hasPartialFiles, response.isRepackable, response.filetype, response.icon, baseFn ? baseFn.bind(this, f) : undefined)
                     )
                 ]);
             } else {
                 // Single file
-                this.files.update(f => [...f, new PlatinumFile(file.name, response.data, false, response.isRepackable, response.icon)]);
+                this.files.update(f => [...f, new PlatinumFile(file.name, response.data, false, response.isRepackable, response.filetype, response.icon)]);
             }
         }
 

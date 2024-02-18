@@ -30,9 +30,6 @@
     on:click={() => $loadedComponentIndex = i}
 >
     {tab.name}
-    <button class="saveBtn">
-        <ContentSave />
-    </button>
     <button class="closeBtn" on:click={removeComponent}>
         <Close />
     </button>

@@ -9,7 +9,7 @@ export interface FileData {
     textures: WTATexture[];
 }
 
-const surfaceTypes = [
+export const surfaceTypes = [
     'T_1D', 'T_2D', 'T_3D',
     'T_Cube',
     'T_1D_Array', 'TD_2D_Array', 'T_2D_Multisample', 'T_2D_Multisample_Array',
@@ -18,7 +18,7 @@ const surfaceTypes = [
 
 // Credit to Kerilk
 // https://github.com/Kerilk/noesis_bayonetta_pc/blob/master/bayonetta_pc/Nier.h
-const textureFormats = {
+export const textureFormats = {
     // DDS
     0x25: "R8G8B8A8_UNORM",
     0x38: "R8_G8_B8_A8_SRGB",
@@ -121,6 +121,16 @@ export class WTATexture {
     }
     get _type() {
         return surfaceTypes[this.type];
+    }
+
+    /**
+     * Recreates the WTATexture if it was serialized.
+     */
+    static recreate(args: any) {
+        let texture = new WTATexture(0, args.wtpOffset, args.wtpSize, args.unknownArrayValue);
+        Object.assign(texture, args);
+
+        return texture;
     }
 
     /**
@@ -269,16 +279,15 @@ export class WTATexture {
      * Loads a texture into a canvas.
      * @returns 
      */
-    load(wtpTexture: ArrayBuffer) {
+    load(wtpTexture: ArrayBuffer, canvas?: HTMLCanvasElement) {
         let wtpImageData = this.getTextureData(wtpTexture);
-        let canvas;
 
         if (this._format.includes('ASTC')) {
             // ASTC
-            canvas = loadASTC(this._format, this.width, this.height, this.depth, wtpImageData);
+            canvas = loadASTC(this._format, this.width, this.height, this.depth, wtpImageData, canvas);
         } else {
             // DDS
-            canvas = loadDDS(this._format, this.width, this.height, this.depth, wtpImageData);
+            canvas = loadDDS(this._format, this.width, this.height, this.depth, wtpImageData, canvas);
         }
 
         return canvas;

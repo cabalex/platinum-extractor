@@ -1,13 +1,13 @@
 const fileInfo = {
-    "ext": "WTA",
+    "ext": "COL",
     // The name of the file format.
-    "name": "WTA",
+    "name": "Collision file",
     // The file magic (first 4 bytes of the file).
-    "magic": "WTB\x00",
+    "magic": "COL2",
     // A description of the file.
-    "description": "WTA files are header data for the corresponding texture data in WTP files.",
+    "description": "Files used for game collision maps.",
     // Icons8 icon name to use for the file.
-    "icon": "image_file",
+    "icon": "file",
     // Credits to who implmeneted it. (I.e., you!)
     "credits": "Cabalex",
 }

@@ -80,7 +80,7 @@ async function parseMessage(type: string, data: any, reply: (data: any) => void)
                         parseMessage(
                             'extract',
                             {target: extractedData.files[i].arrayBuffer, name: extractedData.files[i].name},
-                            (data) => resolve({name: extractedData.files[i].name, data: data.data})
+                            (data) => resolve({name: extractedData.files[i].name, data: data.data, filetype: data.filetype})
                         )
                     });
                 }

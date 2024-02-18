@@ -13,8 +13,6 @@
     export let data: FileData;
     export let setUnsavedChanges: (value: boolean) => {};
 
-    console.log(data);
-
     let repackError: string|false = false;
     let timeout = null;
 
@@ -68,9 +66,12 @@
         timeout = setTimeout(parse.bind(null, e.detail), 1000);
     }
 
-    export const repack = () => {
+    export function save() {
+        parse(value);
+        if (repackError) return false;
+
         let newValue = value.replace(/\r/, '').replace(/(\n)/, "\r\n");
-        if (newValue === new XMLSerializer().serializeToString(data.data)) return;
+        return { data: newValue };
         // update logic here
         //loadedFile.update(value => { value.modified = true; return value });
     }

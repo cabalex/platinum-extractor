@@ -82,8 +82,8 @@ export function addDDSHeader(format: string, width: number, height: number, dept
  * @param textureData An ArrayBuffer containing the texture data.
  * @returns A canvas element containing the texture.
  */
-export function loadDDS(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer) {
-    let canvas = document.createElement('canvas');
+export function loadDDS(format: string, width: number, height: number, depth: number, textureData: ArrayBuffer, canvas?: HTMLCanvasElement) {
+    if (!canvas) canvas = document.createElement('canvas');
     let gl = canvas.getContext('webgl');
     if (gl === null) {
         alert("Unable to initialize WebGL or Canvas2D. Your browser or machine may not support it.");
@@ -247,9 +247,7 @@ export function loadDDS(format: string, width: number, height: number, depth: nu
 
     let imageData = new ImageData(new Uint8ClampedArray(data), width, height);
 
-    let newCanvas = document.createElement('canvas');
-    newCanvas.width = width;
-    newCanvas.height = height;
+    let newCanvas = new OffscreenCanvas(width, height);
     let ctx = newCanvas.getContext('2d');
     if (ctx === null) {
         alert("Unable to initialize WebGL or Canvas2D. Your browser or machine may not support it.");
